@@ -6,7 +6,7 @@ public class Test {
 	 * @param args
 	 */
 	Test() {
-		System.out.println("Test12a");
+		System.out.println("Test");
 	}
 
 }
