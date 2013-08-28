@@ -2,27 +2,30 @@ package com.imaginea.classloader;
 
 import java.io.File;
 import java.lang.reflect.Method;
-/*import java.io.FileInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.jar.JarEntry;
-import java.util.jar.JarInputStream;*/
+import java.util.jar.JarInputStream;
 
 /**
  * Created with IntelliJ IDEA.
  * User: gangaraju
  * Date: 27/8/13
  */
+
 public class CCLRun extends Thread {
     private static File libDir;
+    private static CompilingClassLoader ccl;
 
     public void run() {
         try {
             JarFileLoader loader=JarFileLoader.loadJars(libDir);
-            startApplication(loader,"com.imaginea.AwtExample");
+            ccl = new CompilingClassLoader();
+            startApplication(ccl,"com.imaginea.classloader.Test");
            /* ccl = new CompilingClassLoader();
             Class<?> clas = ccl.loadClass(mainClass.getName(),true);
             Class<?> mainArgType[] = {(new String[0]).getClass()};
@@ -48,7 +51,7 @@ public class CCLRun extends Thread {
         }
     }
 
-    public void startApplication(JarFileLoader loader,String mainClass) throws  Exception {
+    public static void startApplication(JarFileLoader loader,String mainClass) throws  Exception {
         Class<?> clas = loader.loadClass(mainClass);
         Class<?> mainArgType[] = {(new String[0]).getClass()};
         Method main = clas.getMethod("main", mainArgType);
@@ -58,8 +61,17 @@ public class CCLRun extends Thread {
                 + clas.getProtectionDomain().getCodeSource().getLocation());
         loader.close();
     }
+    public static void startApplication(CompilingClassLoader loader,String mainClass) throws  Exception {
+        Class<?> clas = loader.loadClass(mainClass);
+        Class<?> mainArgType[] = {(new String[0]).getClass()};
+        Method main = clas.getMethod("main", mainArgType);
+        Object argsArray[] = { null};
+        main.invoke(null, argsArray);
+        System.out.println("\n" + clas.getName() + " loaded from:"
+                + clas.getProtectionDomain().getCodeSource().getLocation());
+    }
 
-   private static Class<?>[] getClasses(String packageName)
+    private static Class<?>[] getClasses(String packageName)
             throws ClassNotFoundException, IOException {
         ClassLoader classLoader = Thread.currentThread()
                 .getContextClassLoader();
